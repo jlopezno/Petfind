@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "PetFindr Supabase",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "toolArgs": [
+        "--dart-define=USAR_MOCK=false",
+        "--dart-define=SUPABASE_URL=https://yoraosrnnlqenpjtefre.supabase.co",
+        "--dart-define=SUPABASE_ANON_KEY=sb_publishable_psmF742Hds9eFPniSBwCRg_9VHfqh2N"
+      ]
+    },
+    {
+      "name": "PetFindr Mock",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "toolArgs": [
+        "--dart-define=USAR_MOCK=true"
+      ]
+    }
+  ]
+}
