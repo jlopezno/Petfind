@@ -16,6 +16,7 @@ import '../caracteristicas/mascotas/pantallas/pantalla_detalle_mascota.dart';
 import '../caracteristicas/perfil/pantallas/pantalla_perfil.dart';
 import '../caracteristicas/publicaciones/modelos/modelo_publicacion.dart';
 import '../caracteristicas/publicaciones/pantallas/pantalla_admin_pendientes.dart';
+import '../caracteristicas/publicaciones/pantallas/pantalla_adoptar.dart';
 import '../caracteristicas/publicaciones/pantallas/pantalla_crear_publicacion.dart';
 import '../caracteristicas/publicaciones/pantallas/pantalla_detalle_publicacion.dart';
 import '../caracteristicas/publicaciones/pantallas/pantalla_feed.dart';
@@ -75,8 +76,7 @@ final proveedorEnrutador = Provider<GoRouter>((ref) {
               GoRoute(path: 'mapa', builder: (_, __) => const PantallaMapa()),
               GoRoute(
                   path: 'adoptar',
-                  builder: (_, __) => const PantallaFeed(
-                      filtroInicial: TipoPublicacion.adopcion)),
+                  builder: (_, __) => const PantallaAdoptar()),
               GoRoute(
                   path: 'admin-pendientes',
                   builder: (_, __) => const PantallaAdminPendientes()),

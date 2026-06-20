@@ -1,5 +1,6 @@
 // Define el tema visual Material 3 de PetFindr.
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../nucleo/constantes/colores.dart';
 
@@ -13,6 +14,8 @@ final temaPetFindr = ThemeData(
     surface: Colors.white,
   ),
   scaffoldBackgroundColor: colorFondo,
+  textTheme: GoogleFonts.poppinsTextTheme(),
+  primaryTextTheme: GoogleFonts.poppinsTextTheme(),
   appBarTheme: const AppBarTheme(centerTitle: false, elevation: 0),
   cardTheme: CardThemeData(
     color: Colors.white,

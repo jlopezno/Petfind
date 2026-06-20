@@ -62,6 +62,33 @@ class RepositorioPublicacion {
     return lista;
   }
 
+  Future<List<ModeloPublicacion>> obtenerAdopciones({
+    int pagina = 0,
+    int limite = 10,
+  }) async {
+    if (usarMock) {
+      final adopciones = publicacionesMock
+          .where(
+            (publicacion) =>
+                publicacion.tipo == TipoPublicacion.adopcion &&
+                publicacion.estado == EstadoPublicacion.activo,
+          )
+          .toList()
+        ..sort((a, b) => b.creadoEn.compareTo(a.creadoEn));
+      return adopciones.skip(pagina * limite).take(limite).toList();
+    }
+    final data = await ServicioSupabase.instancia.cliente
+        .from('posts')
+        .select()
+        .eq('type', 'adoption')
+        .eq('status', 'active')
+        .order('created_at', ascending: false)
+        .range(pagina * limite, (pagina + 1) * limite - 1);
+    return data
+        .map<ModeloPublicacion>((json) => ModeloPublicacion.fromJson(json))
+        .toList();
+  }
+
   Future<List<ModeloPublicacion>> cercanas(double latitud, double longitud, int radio, {TipoPublicacion? filtro}) async {
     if (usarMock) return obtenerPublicaciones(filtro: filtro);
     final data = await ServicioSupabase.instancia.cliente.rpc('posts_near_location', params: {

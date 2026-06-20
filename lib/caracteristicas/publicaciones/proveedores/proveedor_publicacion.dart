@@ -11,6 +11,10 @@ final proveedorPublicaciones = AsyncNotifierProvider<ProveedorPublicaciones, Lis
 final proveedorPublicacionesRevisionAdmin = FutureProvider<List<ModeloPublicacion>>((ref) {
   return ref.watch(proveedorRepositorioPublicacion).obtenerPendientesRevisionAdmin();
 });
+final proveedorAdopciones =
+    AsyncNotifierProvider<ProveedorAdopciones, List<ModeloPublicacion>>(
+  ProveedorAdopciones.new,
+);
 
 final proveedorDetallePublicacion = FutureProvider.family<ModeloPublicacion?, String>((ref, id) {
   return ref.watch(proveedorRepositorioPublicacion).obtenerPorId(id);
@@ -94,5 +98,50 @@ class ProveedorPublicaciones extends AsyncNotifier<List<ModeloPublicacion>> {
     await ref.read(proveedorRepositorioPublicacion).rechazarPublicacion(id, nota);
     ref.invalidate(proveedorPublicacionesRevisionAdmin);
     await refrescar();
+  }
+}
+
+class ProveedorAdopciones extends AsyncNotifier<List<ModeloPublicacion>> {
+  static const _tamanoPagina = 10;
+  int _pagina = 0;
+  bool _hayMas = true;
+  bool _cargandoMas = false;
+
+  @override
+  Future<List<ModeloPublicacion>> build() async {
+    await ref.watch(proveedorAutenticacion.future);
+    return _cargarPrimeraPagina();
+  }
+
+  Future<List<ModeloPublicacion>> _cargarPrimeraPagina() async {
+    _pagina = 0;
+    _hayMas = true;
+    final primeras = await ref
+        .read(proveedorRepositorioPublicacion)
+        .obtenerAdopciones(limite: _tamanoPagina);
+    _hayMas = primeras.length == _tamanoPagina;
+    return primeras;
+  }
+
+  Future<void> cargarMas() async {
+    if (_cargandoMas || !_hayMas) return;
+    _cargandoMas = true;
+    try {
+      final siguientes = await ref
+          .read(proveedorRepositorioPublicacion)
+          .obtenerAdopciones(pagina: _pagina + 1, limite: _tamanoPagina);
+      _pagina++;
+      _hayMas = siguientes.length == _tamanoPagina;
+      if (siguientes.isNotEmpty) {
+        state = AsyncData([...state.valueOrNull ?? [], ...siguientes]);
+      }
+    } finally {
+      _cargandoMas = false;
+    }
+  }
+
+  Future<void> refrescar() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(_cargarPrimeraPagina);
   }
 }
