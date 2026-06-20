@@ -63,7 +63,7 @@ class _PantallaAdoptarState extends ConsumerState<PantallaAdoptar> {
         child: RefreshIndicator(
           onRefresh: () => ref.read(proveedorAdopciones.notifier).refrescar(),
           child: adopciones.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const _PantallaCargaAdopciones(),
             error: (_, __) => const _EstadoAdopciones(
               icono: Icons.error_outline,
               titulo: 'No pudimos cargar las adopciones',
@@ -168,11 +168,7 @@ class _PantallaAdoptarState extends ConsumerState<PantallaAdoptar> {
                         publicacion: visibles[index],
                       ),
                     ),
-                  if (_cargandoMas)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
+                  if (_cargandoMas) const _SkeletonTarjetasAdopcion(),
                 ],
               );
             },
@@ -403,12 +399,120 @@ class _FotoMascota extends StatelessWidget {
       height: 120,
       width: double.infinity,
       fit: BoxFit.cover,
+      placeholder: (_, __) => const _Skeleton(bordeRadio: 0),
       errorWidget: (_, __, ___) => Container(
         height: 120,
         color: const Color(0xFFEDE9FF),
         alignment: Alignment.center,
         child: const Icon(Icons.pets_outlined,
             size: 52, color: Color(0xFF6C4DF6)),
+      ),
+    );
+  }
+}
+
+class _PantallaCargaAdopciones extends StatelessWidget {
+  const _PantallaCargaAdopciones();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+      children: [
+        const _Skeleton(ancho: 218, alto: 28),
+        const SizedBox(height: 9),
+        const _Skeleton(ancho: 260, alto: 16),
+        const SizedBox(height: 22),
+        const _Skeleton(alto: 56, bordeRadio: 18),
+        const SizedBox(height: 28),
+        const _Skeleton(ancho: 100, alto: 20),
+        const SizedBox(height: 12),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: 4,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 2.5,
+          ),
+          itemBuilder: (_, __) => const _Skeleton(bordeRadio: 8),
+        ),
+        const SizedBox(height: 30),
+        const _Skeleton(ancho: 190, alto: 20),
+        const SizedBox(height: 14),
+        const _SkeletonTarjetasAdopcion(),
+      ],
+    );
+  }
+}
+
+class _SkeletonTarjetasAdopcion extends StatelessWidget {
+  const _SkeletonTarjetasAdopcion();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 14),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: 2,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: .62,
+        ),
+        itemBuilder: (_, __) => const _Skeleton(bordeRadio: 8),
+      ),
+    );
+  }
+}
+
+class _Skeleton extends StatefulWidget {
+  const _Skeleton({this.ancho, this.alto, this.bordeRadio = 8});
+
+  final double? ancho;
+  final double? alto;
+  final double bordeRadio;
+
+  @override
+  State<_Skeleton> createState() => _SkeletonState();
+}
+
+class _SkeletonState extends State<_Skeleton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controlador;
+
+  @override
+  void initState() {
+    super.initState();
+    _controlador = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 850),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controlador.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: Tween<double>(begin: .45, end: .85).animate(_controlador),
+      child: Container(
+        width: widget.ancho,
+        height: widget.alto,
+        decoration: BoxDecoration(
+          color: const Color(0xFFE1E1E4),
+          borderRadius: BorderRadius.circular(widget.bordeRadio),
+        ),
       ),
     );
   }
