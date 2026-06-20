@@ -1,4 +1,6 @@
 // Maneja sesion y registro de usuarios.
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -105,5 +107,35 @@ class ProveedorAutenticacion extends AsyncNotifier<ModeloUsuario?> {
           .signOut(scope: SignOutScope.local);
     }
     state = const AsyncData(null);
+  }
+
+  Future<void> actualizarAvatar({
+    required Uint8List bytes,
+    required String extension,
+    required String contentType,
+  }) async {
+    final perfil = state.valueOrNull;
+    if (perfil == null) {
+      throw StateError('No se encontro el perfil del usuario.');
+    }
+    if (usarMock) return;
+
+    final storage = ServicioSupabase.instancia.cliente.storage.from('avatares');
+    final path = '${perfil.id}/avatar-${DateTime.now().millisecondsSinceEpoch}.$extension';
+    await storage.uploadBinary(
+      path,
+      bytes,
+      fileOptions: FileOptions(
+        cacheControl: '3600',
+        contentType: contentType,
+      ),
+    );
+    final url = storage.getPublicUrl(path);
+    await ServicioSupabase.instancia.cliente
+        .from('profiles')
+        .update({'avatar_url': url}).eq('id', perfil.id);
+    state = AsyncData(
+      perfil.copyWith(avatarUrl: url, actualizadoEn: DateTime.now()),
+    );
   }
 }

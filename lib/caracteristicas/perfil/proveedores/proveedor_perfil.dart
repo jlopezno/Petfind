@@ -9,6 +9,17 @@ import '../../autenticacion/proveedores/proveedor_autenticacion.dart';
 
 final proveedorPerfil = AsyncNotifierProvider<ProveedorPerfil, ModeloUsuario?>(ProveedorPerfil.new);
 
+final proveedorPerfilPorId =
+    FutureProvider.family<ModeloUsuario?, String>((ref, id) async {
+  if (usarMock) return usuariosMock.where((usuario) => usuario.id == id).firstOrNull;
+  final data = await ServicioSupabase.instancia.cliente
+      .from('profiles')
+      .select()
+      .eq('id', id)
+      .maybeSingle();
+  return data == null ? null : ModeloUsuario.fromJson(data);
+});
+
 class ProveedorPerfil extends AsyncNotifier<ModeloUsuario?> {
   @override
   Future<ModeloUsuario?> build() async => ref.watch(proveedorAutenticacion).valueOrNull;
