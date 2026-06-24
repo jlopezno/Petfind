@@ -5,10 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../compartido/servicios/servicio_notificaciones_push.dart';
 import '../../../nucleo/constantes/colores.dart';
 import '../../../nucleo/constantes/mock_data.dart';
+import '../../../nucleo/constantes/rutas.dart';
 import '../../autenticacion/proveedores/proveedor_autenticacion.dart';
 import '../../avistamientos/proveedores/proveedor_avistamiento.dart';
 import '../../calificaciones/widgets/widget_calificacion.dart';
@@ -53,13 +55,14 @@ class PantallaDetallePublicacion extends ConsumerWidget {
                   context.go('/publicacion/editar/${publicacionActual.id}'),
               icon: const Icon(Icons.edit_outlined),
               tooltip: 'Editar publicacion',
-            )
-          else
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.share_outlined),
-              tooltip: 'Compartir',
             ),
+          IconButton(
+            onPressed: publicacionActual == null
+                ? null
+                : () => _compartirPublicacion(publicacionActual),
+            icon: const Icon(Icons.share_outlined),
+            tooltip: 'Compartir',
+          ),
         ],
       ),
       body: detalle.when(
@@ -202,7 +205,7 @@ class PantallaDetallePublicacion extends ConsumerWidget {
       return [
         if (meta != null) ...[
           const Text('Apoyo economico acumulado'),
-          LinearProgressIndicator(value: .35),
+          const LinearProgressIndicator(value: .35),
           const SizedBox(height: 8),
           Text('S/. ${(meta * .35).toStringAsFixed(0)} de S/. ${meta.toStringAsFixed(0)}'),
         ],
@@ -282,6 +285,28 @@ class PantallaDetallePublicacion extends ConsumerWidget {
         TipoPublicacion.adopcion => 'Caso de adopcion',
         null => 'Detalle',
       };
+}
+
+Future<void> _compartirPublicacion(ModeloPublicacion publicacion) async {
+  final nombre = publicacion.nombreMascota?.trim().isNotEmpty == true
+      ? publicacion.nombreMascota!.trim()
+      : publicacion.titulo.trim().isNotEmpty
+          ? publicacion.titulo.trim()
+          : 'Esta mascota';
+  final ubicacion = publicacion.direccion?.trim();
+  final enlace = 'https://${Rutas.dominioEnlaces}/p/${publicacion.id}';
+  final lineas = <String>[
+    '🐾 $nombre',
+    '',
+    'Estado: ${publicacion.tipo.etiqueta}',
+    if (ubicacion != null && ubicacion.isNotEmpty) 'Ubicacion: $ubicacion',
+    '',
+    'Conoce esta publicacion y ayuda a compartirla.',
+    enlace,
+    '',
+    'Compartido desde PetFindr.',
+  ];
+  await SharePlus.instance.share(ShareParams(text: lineas.join('\n')));
 }
 
 class _CarruselPublicacion extends StatefulWidget {

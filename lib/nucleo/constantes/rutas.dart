@@ -2,6 +2,7 @@
 class Rutas {
   const Rutas._();
 
+  static const dominioEnlaces = 'petfindr.velkarth.lat';
   static const raiz = '/';
   static const cargaInicial = '/cargando';
   static const onboarding = '/onboarding';
