@@ -1,3 +1,7 @@
+
+
+https://github.com/user-attachments/assets/ea9914b5-5f3c-4e69-8a03-b93f263c456c
+
 # PetFindr
 
 Aplicación móvil y web desarrollada en Flutter para la comunidad peruana que facilita la **búsqueda de mascotas perdidas**, la **publicación de mascotas rescatadas** (con opción de apoyo económico voluntario) y la **gestión de adopciones**. Incluye geolocalización, notificaciones push, calificaciones entre usuarios y un flujo de moderación por administrador.
